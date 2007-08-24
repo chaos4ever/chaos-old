@@ -27,7 +27,7 @@ ARCH=i386
 RPMARCH=i386
 endif
 
-MAINDIR=/grog/Projects/QW
+MAINDIR=$(shell pwd)
 
 BUILD_DEBUG_DIR=debug$(ARCH)$(GLIBC)
 BUILD_RELEASE_DIR=release$(ARCH)$(GLIBC)
@@ -37,7 +37,7 @@ SERVER_DIR=$(MAINDIR)/server
 MESA_DIR=/usr/local/src/Mesa-3.0
 
 CC=gcc
-BASE_CFLAGS=-Wall -Dstricmp=strcasecmp -I$(CLIENT_DIR) -I$(SERVER_DIR)
+BASE_CFLAGS=-Wall -Dstricmp=strcasecmp -I$(CLIENT_DIR) -I$(SERVER_DIR) -I/usr/src/linux-headers-2.6.18-4/include
 DEBUG_CFLAGS=$(BASE_CFLAGS) -g
 ifeq ($(ARCH),axp)
 RELEASE_CFLAGS=$(BASE_CFLAGS) -ffast-math -funroll-loops \
@@ -71,22 +71,24 @@ ifeq ($(ARCH),axp)
 TARGETS=$(BUILDDIR)/qwsv 
 #$(BUILDDIR)/qwcl.x11
 else
-TARGETS=$(BUILDDIR)/qwsv $(BUILDDIR)/qwcl $(BUILDDIR)/qwcl.x11 $(BUILDDIR)/glqwcl $(BUILDDIR)/glqwcl.glx
+TARGETS=$(BUILDDIR)/qwsv $(BUILDDIR)/qwcl $(BUILDDIR)/qwcl.x11 # $(BUILDDIR)/glqwcl $(BUILDDIR)/glqwcl.glx
 endif
 
 build_debug:
 	@-mkdir $(BUILD_DEBUG_DIR) \
 		$(BUILD_DEBUG_DIR)/client \
-		$(BUILD_DEBUG_DIR)/glclient \
 		$(BUILD_DEBUG_DIR)/server 
 	$(MAKE) targets BUILDDIR=$(BUILD_DEBUG_DIR) CFLAGS="$(DEBUG_CFLAGS)"
+
+#		$(BUILD_DEBUG_DIR)/glclient \
 
 build_release:
 	@-mkdir $(BUILD_RELEASE_DIR) \
 		$(BUILD_RELEASE_DIR)/client \
-		$(BUILD_RELEASE_DIR)/glclient \
 		$(BUILD_RELEASE_DIR)/server
 	$(MAKE) targets BUILDDIR=$(BUILD_RELEASE_DIR) CFLAGS="$(RELEASE_CFLAGS)"
+
+#		$(BUILD_RELEASE_DIR)/glclient \
 
 all: build_debug build_release
 
